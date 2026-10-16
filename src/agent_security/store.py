@@ -56,3 +56,24 @@ class LabStore:
             return self._tickets[ticket_id]
         except KeyError:
             raise ResourceNotFound("Ticket not found") from None
+
+    def create_ticket(self, workspace: str, title: str) -> Ticket:
+        """Internal operation; callers must enforce authorization first."""
+        from uuid import uuid4
+
+        ticket_id = f"ticket-{uuid4().hex}"
+        ticket = Ticket(ticket_id, workspace, title)
+        self._tickets[ticket_id] = ticket
+        return ticket
+
+    def close_ticket(self, ticket_id: str) -> Ticket:
+        """Internal operation; callers must enforce authorization first."""
+        from dataclasses import replace
+
+        ticket = self.get_ticket(ticket_id)
+        if ticket.status != "open":
+            raise ValueError("Ticket is not open")
+
+        closed = replace(ticket, status="closed")
+        self._tickets[ticket_id] = closed
+        return closed

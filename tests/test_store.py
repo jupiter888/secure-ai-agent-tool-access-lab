@@ -50,3 +50,61 @@ def test_ticket_ownership_cannot_be_reassigned():
 
     with pytest.raises(FrozenInstanceError):
         ticket.workspace = "workspace-b"
+
+
+def test_create_ticket_preserves_workspace_and_title():
+    store = LabStore()
+
+    ticket = store.create_ticket("workspace-a", "Investigate synthetic alert")
+
+    assert ticket.workspace == "workspace-a"
+    assert ticket.title == "Investigate synthetic alert"
+    assert ticket.status == "open"
+    assert store.get_ticket(ticket.ticket_id) == ticket
+
+
+def test_created_tickets_have_distinct_ids():
+    store = LabStore()
+
+    first = store.create_ticket("workspace-a", "First ticket")
+    second = store.create_ticket("workspace-a", "Second ticket")
+
+    assert first.ticket_id != second.ticket_id
+    assert store.get_ticket(first.ticket_id) == first
+    assert store.get_ticket(second.ticket_id) == second
+
+
+def test_close_ticket_preserves_ownership_and_title():
+    store = LabStore()
+    original = store.get_ticket("ticket-a")
+
+    closed = store.close_ticket("ticket-a")
+
+    assert closed.status == "closed"
+    assert closed.ticket_id == original.ticket_id
+    assert closed.workspace == original.workspace
+    assert closed.title == original.title
+    assert store.get_ticket("ticket-a") == closed
+    assert store.get_ticket("ticket-b").status == "open"
+
+
+def test_closed_ticket_cannot_be_closed_again():
+    store = LabStore()
+    store.close_ticket("ticket-a")
+
+    with pytest.raises(ValueError, match="Ticket is not open"):
+        store.close_ticket("ticket-a")
+
+
+def test_closing_missing_ticket_is_rejected():
+    with pytest.raises(ResourceNotFound):
+        LabStore().close_ticket("missing")
+
+
+def test_store_instances_do_not_share_changes():
+    first = LabStore()
+    second = LabStore()
+
+    first.close_ticket("ticket-a")
+
+    assert second.get_ticket("ticket-a").status == "open"
