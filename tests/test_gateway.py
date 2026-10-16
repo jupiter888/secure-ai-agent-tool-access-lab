@@ -141,3 +141,50 @@ def test_stop_blocks_every_tool(context, tool, arguments):
         gateway.execute(operator, tool, arguments, token)
 
     assert store.get_ticket("ticket-a").status == "open"
+
+
+def test_reused_approval_is_denied_at_gateway(context):
+    store, approvals, gateway, operator = context
+    arguments = {"ticket_id": "ticket-a"}
+    token = approvals.issue(
+        operator, "close_ticket", arguments, "workspace-a"
+    )
+
+    gateway.execute(operator, "close_ticket", arguments, token)
+
+    with pytest.raises(ApprovalDenied):
+        gateway.execute(operator, "close_ticket", arguments, token)
+
+    assert store.get_ticket("ticket-a").status == "closed"
+    events = gateway.audit.snapshot()
+    assert [event.outcome for event in events] == ["allowed", "denied"]
+
+
+def test_concurrent_closures_execute_only_once(context):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    store, approvals, gateway, operator = context
+    arguments = {"ticket_id": "ticket-a"}
+    token = approvals.issue(
+        operator, "close_ticket", arguments, "workspace-a"
+    )
+    barrier = Barrier(2)
+
+    def attempt():
+        barrier.wait(timeout=5)
+        try:
+            gateway.execute(operator, "close_ticket", arguments, token)
+            return "executed"
+        except ApprovalDenied:
+            return "denied"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(attempt) for _ in range(2)]
+        results = [future.result(timeout=10) for future in futures]
+
+    assert sorted(results) == ["denied", "executed"]
+    assert store.get_ticket("ticket-a").status == "closed"
+    events = gateway.audit.snapshot()
+    assert sum(event.outcome == "allowed" for event in events) == 1
+    assert sum(event.outcome == "denied" for event in events) == 1

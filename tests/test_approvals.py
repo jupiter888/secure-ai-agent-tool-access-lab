@@ -134,3 +134,26 @@ def test_nonapproval_tool_cannot_receive_approval(context):
             {"document_id": "doc-a"},
             "workspace-a",
         )
+
+
+def test_concurrent_requests_cannot_reuse_approval(context):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    store, identity, arguments, _ = context
+    token = issue(store, identity, arguments)
+    barrier = Barrier(2)
+
+    def attempt():
+        barrier.wait(timeout=5)
+        try:
+            store.consume(token, identity, "close_ticket", arguments)
+            return "consumed"
+        except ApprovalDenied:
+            return "denied"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(attempt) for _ in range(2)]
+        results = [future.result(timeout=10) for future in futures]
+
+    assert sorted(results) == ["consumed", "denied"]
