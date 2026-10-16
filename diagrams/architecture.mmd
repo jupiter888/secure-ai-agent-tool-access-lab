@@ -1,0 +1,12 @@
+flowchart TD
+    Context["Trusted identity context"] --> Gateway["Tool gateway"]
+    Agent["Agent: untrusted requests"] --> Gateway
+    Gateway --> Checks["Argument, role and workspace checks"]
+    Checks --> Approval["Approval check for closure"]
+    Human["Trusted approval path: pending"] -.-> Tokens["Approval store"]
+    Tokens --> Approval
+    Approval --> Store["Synthetic resource store"]
+    Store --> Output["Untrusted tool results"]
+    Output --> Agent
+    Gateway --> Audit["Sanitized audit log"]
+    Stop["Trusted stop control"] --> Gateway
