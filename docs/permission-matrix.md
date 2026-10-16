@@ -1,6 +1,8 @@
 # Tool Permission Matrix
 
-Status: proposed; not yet implemented or tested.
+Status: implemented and tested within the local lab's trusted application
+boundary. Identity authentication and separate approver authentication
+are not implemented. See architecture.md and threat-model.md for limits.
 
 All tools operate on synthetic, local lab data.
 

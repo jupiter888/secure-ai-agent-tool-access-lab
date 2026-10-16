@@ -1,39 +1,73 @@
 # Project 6 — Secure AI Agent and Tool Access
 
-An independent security lab demonstrating how an application controls
-an AI agent's access to tools. All data and actions are synthetic and local.
+An independent security lab demonstrating application-enforced controls
+over AI agent tool requests. All records and actions are synthetic and local.
 
-## Security objective
+## Implemented controls
 
-Treat agent requests and tool outputs as untrusted. Enforce authorization
-outside the model, require human approval for designated actions, and
-record security decisions.
+- Deny-by-default role and workspace authorization.
+- Strict tool argument validation.
+- Application-controlled resource ownership resolution.
+- Explicit local human confirmation for ticket closure.
+- Expiring, single-use approvals bound to identity, tool, and exact arguments.
+- Serialized tool execution and atomic approval consumption.
+- A stop mechanism blocking subsequent gateway requests.
+- Sanitized execution audit events with pseudonymous actor references.
 
-## Planned controls
+## Tools
 
-- Deny-by-default tool permissions.
-- Authorization enforced by application code.
-- Validation of tool arguments.
-- Human approval bound to a specific action.
-- Protection against approval reuse and bypass.
-- Audit records for allowed and denied actions.
-- A stop mechanism that blocks tool execution.
-- A documented recovery procedure.
+| Tool | reader | operator | Human approval |
+| --- | --- | --- | --- |
+| read_document | Own workspace | Own workspace | No |
+| create_ticket | Denied | Own workspace | No |
+| close_ticket | Denied | Own workspace | Required |
 
-## Planned validation
+## Setup
 
-- Allowed and unauthorized tool requests.
-- Malicious instructions embedded in tool results.
-- Missing, mismatched, and reused approvals.
-- Invalid tool arguments.
-- Tool execution after the stop mechanism is activated.
+Requires Python 3.11 or later.
 
-## Evidence and documentation
+    python3 -m venv .venv
+    source .venv/bin/activate
+    python -m pip install -e .
+    python -m pip install -r requirements-dev.txt
 
-Permission matrix, architecture diagram, threat model, test results,
-sanitized audit examples, recovery runbook, and verified MITRE ATLAS mappings.
+## Run tests
 
-## Status
+    python -m pytest -q
 
-Initial setup. Controls listed above are planned, not yet implemented
-or tested.
+Latest observed result: 119 tests passed.
+
+Coverage includes role and workspace isolation, invalid arguments,
+approval binding, expiration, replay, concurrent consumption, stop behavior,
+audit sanitization, and simulated malicious tool-result instructions.
+
+## Run the console demonstration
+
+    python -m agent_security.demo
+
+Type APPROVE when prompted to demonstrate approved closure and replay denial.
+Any other response declines approval. Each run starts with fresh lab records.
+
+## Documentation
+
+- [Architecture and trust boundaries](docs/architecture.md)
+- [Architecture diagram source](diagrams/architecture.mmd)
+- [Permission matrix](docs/permission-matrix.md)
+- [Threat model and residual risks](docs/threat-model.md)
+- [Stop and recovery runbook](docs/recovery-runbook.md)
+- [Manual approval demonstration](evidence/manual-approval-demo.md)
+
+## Evidence boundaries
+
+No live model is integrated. Injection tests simulate requests made after
+an agent follows malicious tool output; they validate the application
+controls rather than model resistance to prompt injection.
+
+Identity and the local approval console are trusted. Separate approver
+authentication, process isolation, durable storage, and distributed
+enforcement are not implemented.
+
+Audit events cover tool execution outcomes. Approval lifecycle events
+and stop activation are not separately audited.
+
+MITRE ATLAS mappings remain pending verification.
