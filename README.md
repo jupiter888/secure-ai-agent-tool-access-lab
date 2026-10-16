@@ -70,4 +70,8 @@ enforcement are not implemented.
 Audit events cover tool execution outcomes. Approval lifecycle events
 and stop activation are not separately audited.
 
-MITRE ATLAS mappings remain pending verification.
+## MITRE ATLAS
+
+[Technique mappings and evidence limits](docs/mitre-atlas-mapping.md)
+cover indirect prompt injection and agent tool invocation, using an
+official MITRE reference.
