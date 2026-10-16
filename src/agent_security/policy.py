@@ -38,6 +38,9 @@ def authorize(
 ) -> ToolPolicy:
     """Check role and workspace; approval is enforced separately."""
 
+    if not isinstance(identity, Identity):
+        raise AuthorizationDenied("Invalid identity context")
+
     if not all(
         isinstance(value, str) and value.strip()
         for value in (

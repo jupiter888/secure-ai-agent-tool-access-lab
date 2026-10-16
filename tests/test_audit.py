@@ -177,3 +177,27 @@ def test_missing_subject_uses_unknown_reference():
     audit.record("read_document", "denied", "AuthorizationDenied")
 
     assert audit.snapshot()[0].actor_ref == "unknown"
+
+
+def test_audit_failure_does_not_roll_back_completed_action():
+    class FailingAudit(AuditLog):
+        def record(self, *args, **kwargs):
+            raise OSError("Synthetic audit failure")
+
+    store = LabStore()
+    approvals = ApprovalStore()
+    gateway = ToolGateway(store, approvals, FailingAudit())
+    identity = Identity("user-001", "operator", "workspace-a")
+    arguments = {"ticket_id": "ticket-a"}
+    token = approvals.issue(
+        identity, "close_ticket", arguments, "workspace-a"
+    )
+
+    with pytest.raises(OSError, match="Synthetic audit failure"):
+        gateway.execute(identity, "close_ticket", arguments, token)
+
+    assert store.get_ticket("ticket-a").status == "closed"
+
+    # The action completed and its approval remains consumed.
+    with pytest.raises(ApprovalDenied):
+        approvals.consume(token, identity, "close_ticket", arguments)

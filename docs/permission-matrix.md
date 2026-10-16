@@ -14,7 +14,8 @@ All tools operate on synthetic, local lab data.
 
 ## Enforcement rules
 
-- Unknown identities, roles, and tools are denied.
+- Malformed identity context, unknown roles, and unknown tools are denied.
+- Subject identifiers are trusted inputs; no identity registry is implemented.
 - Identity and role come from trusted application context, never model output.
 - Readers may access only documents in their assigned workspace.
 - Operators may access documents and tickets only in their assigned workspace.

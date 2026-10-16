@@ -2,7 +2,7 @@ import json
 from collections.abc import Callable
 
 from agent_security.approvals import ApprovalDenied, ApprovalStore
-from agent_security.policy import Identity, authorize
+from agent_security.policy import AuthorizationDenied, Identity, authorize
 from agent_security.store import LabStore
 from agent_security.validation import validate_arguments
 
@@ -26,6 +26,8 @@ class HumanApproval:
         arguments = validate_arguments(
             "close_ticket", {"ticket_id": ticket_id}
         )
+        if not isinstance(identity, Identity):
+            raise AuthorizationDenied("Invalid identity context")
         authorize(identity, "close_ticket", identity.workspace)
         ticket = self._store.get_ticket(arguments["ticket_id"])
         authorize(identity, "close_ticket", ticket.workspace)

@@ -27,36 +27,56 @@ sequenceDiagram
     participant Gateway as Tool gateway
     participant Store as Resource store
 
+    Note over App,Store: Attempt without approval
     App->>Gateway: Close ticket without token
-    Gateway->>Gateway: Validate and authorize
+    Gateway->>Gateway: Check stop, arguments, identity and role
+    Gateway->>Store: Resolve ticket ownership
+    Store-->>Gateway: Ticket
+    Gateway->>Gateway: Authorize workspace
     Gateway->>Approvals: Consume missing token
     Approvals-->>Gateway: Deny
-    Gateway-->>App: ApprovalDenied; audit denial
+    Gateway->>Gateway: Record denied execution
+    Gateway-->>App: ApprovalDenied
 
-    App->>Store: Resolve ticket for human review
+    Note over Human,Approvals: Trusted local human approval
+    App->>App: Validate arguments, identity and role
+    App->>Store: Resolve ticket for review
     Store-->>App: Ownership, title and status
-    App->>App: Check role, workspace and open status
+    App->>App: Check workspace and open status
     App->>Human: Display exact proposed closure
     Human-->>App: Type APPROVE
-    App->>Approvals: Issue bound, expiring token
-    Approvals-->>App: Token
+    App->>Approvals: Request token for reviewed action
+    Approvals->>Approvals: Validate arguments, role and workspace
+    Approvals->>Approvals: Bind identity and action, set expiry
+    Approvals-->>App: Single-use token
 
+    Note over App,Store: Approved execution
     App->>Gateway: Close ticket with token
-    Gateway->>Gateway: Check stop, arguments and role
-    Gateway->>Store: Resolve current ownership
+    Gateway->>Gateway: Check stop, arguments, identity and role
+    Gateway->>Store: Resolve current ticket ownership
     Store-->>Gateway: Ticket
     Gateway->>Gateway: Authorize workspace
     Gateway->>Approvals: Validate and consume token
-    Approvals-->>Gateway: Accepted
+    Approvals->>Approvals: Check expiry and exact request match
+    Approvals-->>Gateway: Accepted and consumed atomically
     Gateway->>Store: Close ticket
     Store-->>Gateway: Closed ticket
-    Gateway-->>App: Success; audit allowed
+    Gateway->>Gateway: Record allowed execution
+    Gateway-->>App: Closed ticket
 
+    Note over App,Store: Replay attempt
     App->>Gateway: Repeat closure with same token
-    Gateway->>Gateway: Validate and authorize again
+    Gateway->>Gateway: Check stop, arguments, identity and role
+    Gateway->>Store: Resolve current ticket ownership
+    Store-->>Gateway: Closed ticket
+    Gateway->>Gateway: Authorize workspace
     Gateway->>Approvals: Consume reused token
-    Approvals-->>Gateway: Deny
-    Gateway-->>App: ApprovalDenied; audit denial
+    Approvals-->>Gateway: Deny consumed token
+    Gateway->>Gateway: Record denied execution
+    Gateway-->>App: ApprovalDenied
+
+    Note over Human,App: Console operator is trusted, separate approver authentication is absent
+    Note over Gateway,Store: Audit writes are not transactional with resource changes
 ```
 
 ## Malicious tool-result attack flow

@@ -113,3 +113,21 @@ def test_closed_ticket_never_prompts(context):
         human.request_closure(identity, "ticket-a")
 
     assert prompts == []
+
+
+@pytest.mark.parametrize("identity", [None, {}, "operator"])
+def test_malformed_identity_never_prompts(context, identity):
+    store, approvals, _ = context
+    prompts = []
+    human = HumanApproval(
+        store,
+        approvals,
+        read_input=lambda prompt: prompts.append(prompt) or "APPROVE",
+        write_output=lambda _: None,
+    )
+
+    with pytest.raises(AuthorizationDenied):
+        human.request_closure(identity, "ticket-a")
+
+    assert prompts == []
+    assert store.get_ticket("ticket-a").status == "open"

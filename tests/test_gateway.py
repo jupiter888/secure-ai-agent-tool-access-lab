@@ -188,3 +188,20 @@ def test_concurrent_closures_execute_only_once(context):
     events = gateway.audit.snapshot()
     assert sum(event.outcome == "allowed" for event in events) == 1
     assert sum(event.outcome == "denied" for event in events) == 1
+
+
+@pytest.mark.parametrize("identity", [None, {}, "operator"])
+def test_malformed_identity_is_denied_and_audited(context, identity):
+    store, _, gateway, _ = context
+
+    with pytest.raises(AuthorizationDenied):
+        gateway.execute(
+            identity, "close_ticket", {"ticket_id": "ticket-a"}
+        )
+
+    assert store.get_ticket("ticket-a").status == "open"
+    events = gateway.audit.snapshot()
+    assert len(events) == 1
+    assert events[0].outcome == "denied"
+    assert events[0].reason == "AuthorizationDenied"
+    assert events[0].actor_ref == "unknown"

@@ -39,6 +39,11 @@ class ToolGateway:
         approval_token: str = "",
     ):
         with self._lock:
+            subject = (
+                identity.subject
+                if isinstance(identity, Identity)
+                else ""
+            )
             try:
                 result = self._execute(
                     identity, tool, arguments, approval_token
@@ -50,13 +55,13 @@ class ToolGateway:
                 ApprovalDenied,
                 ResourceNotFound,
             ) as exc:
-                self.audit.record(tool, "denied", type(exc).__name__, identity.subject)
+                self.audit.record(tool, "denied", type(exc).__name__, subject)
                 raise
             except Exception:
-                self.audit.record(tool, "error", "execution_error", identity.subject)
+                self.audit.record(tool, "error", "execution_error", subject)
                 raise
 
-            self.audit.record(tool, "allowed", "executed", identity.subject)
+            self.audit.record(tool, "allowed", "executed", subject)
             return result
 
     def _execute(
@@ -72,6 +77,8 @@ class ToolGateway:
         validated = validate_arguments(tool, arguments)
 
         # Check role before looking up a resource.
+        if not isinstance(identity, Identity):
+            raise AuthorizationDenied("Invalid identity context")
         authorize(identity, tool, identity.workspace)
 
         if tool == "read_document":

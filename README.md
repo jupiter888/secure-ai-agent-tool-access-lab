@@ -35,7 +35,7 @@ Requires Python 3.11 or later.
 
     python -m pytest -q
 
-Latest observed result: 119 tests passed.
+Latest observed result: 126 tests passed.
 
 Coverage includes role and workspace isolation, invalid arguments,
 approval binding, expiration, replay, concurrent consumption, stop behavior,
@@ -57,8 +57,10 @@ Any other response declines approval. Each run starts with fresh lab records.
 - [Malicious tool-result attack flow](diagrams/tool-result-attack-flow.mmd)
 - [Permission matrix](docs/permission-matrix.md)
 - [Threat model and residual risks](docs/threat-model.md)
+- [Validation and audit findings](docs/validation.md)
 - [Stop and recovery runbook](docs/recovery-runbook.md)
 - [Manual approval demonstration](evidence/manual-approval-demo.md)
+- [Automated test results](evidence/pytest-results.txt)
 
 ## Evidence boundaries
 
