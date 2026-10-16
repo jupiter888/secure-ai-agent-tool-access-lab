@@ -1,0 +1,116 @@
+from dataclasses import asdict
+
+import pytest
+
+from agent_security.approvals import ApprovalDenied, ApprovalStore
+from agent_security.audit import AuditLog
+from agent_security.gateway import ExecutionStopped, ToolGateway
+from agent_security.policy import AuthorizationDenied, Identity
+from agent_security.store import LabStore
+from agent_security.validation import InvalidArguments
+
+
+@pytest.fixture
+def context():
+    audit = AuditLog()
+    gateway = ToolGateway(LabStore(), ApprovalStore(), audit)
+    identity = Identity("user-001", "operator", "workspace-a")
+    return gateway, audit, identity
+
+
+def test_success_records_one_allowed_event(context):
+    gateway, audit, identity = context
+
+    gateway.execute(identity, "read_document", {"document_id": "doc-a"})
+
+    events = audit.snapshot()
+    assert len(events) == 1
+    assert events[0].tool == "read_document"
+    assert events[0].outcome == "allowed"
+    assert events[0].reason == "executed"
+
+
+@pytest.mark.parametrize(
+    "tool,arguments,exception,reason",
+    [
+        (
+            "read_document",
+            {"document_id": "doc-b"},
+            AuthorizationDenied,
+            "AuthorizationDenied",
+        ),
+        (
+            "close_ticket",
+            {"ticket_id": "ticket-a"},
+            ApprovalDenied,
+            "ApprovalDenied",
+        ),
+        (
+            "create_ticket",
+            {"title": "Example", "approved": True},
+            InvalidArguments,
+            "InvalidArguments",
+        ),
+    ],
+)
+def test_denials_record_one_event(
+    context, tool, arguments, exception, reason
+):
+    gateway, audit, identity = context
+
+    with pytest.raises(exception):
+        gateway.execute(identity, tool, arguments)
+
+    events = audit.snapshot()
+    assert len(events) == 1
+    assert events[0].outcome == "denied"
+    assert events[0].reason == reason
+
+
+def test_stopped_request_is_audited(context):
+    gateway, audit, identity = context
+    gateway.stop()
+
+    with pytest.raises(ExecutionStopped):
+        gateway.execute(
+            identity, "read_document", {"document_id": "doc-a"}
+        )
+
+    assert audit.snapshot()[0].reason == "ExecutionStopped"
+
+
+def test_title_and_token_are_excluded(context):
+    gateway, audit, identity = context
+    title = "SYNTHETIC-SENSITIVE-TITLE"
+    token = "SYNTHETIC-SECRET-TOKEN"
+
+    gateway.execute(
+        identity, "create_ticket", {"title": title}, token
+    )
+
+    serialized = repr([asdict(event) for event in audit.snapshot()])
+    assert title not in serialized
+    assert token not in serialized
+
+
+def test_unknown_tool_name_is_sanitized(context):
+    gateway, audit, identity = context
+    untrusted_name = "SYNTHETIC-SECRET\nforged-log-entry"
+
+    with pytest.raises(InvalidArguments):
+        gateway.execute(identity, untrusted_name, {})
+
+    assert audit.snapshot()[0].tool == "unknown"
+    assert untrusted_name not in repr(audit.snapshot())
+
+
+def test_snapshot_does_not_change_when_log_grows():
+    audit = AuditLog()
+    audit.record("read_document", "allowed", "executed")
+    earlier = audit.snapshot()
+
+    audit.record("create_ticket", "allowed", "executed")
+
+    assert len(earlier) == 1
+    assert len(audit.snapshot()) == 2
+    assert earlier[0].event_id != audit.snapshot()[1].event_id
