@@ -41,9 +41,20 @@ not receive direct store access or arbitrary Python execution.
 Approval tokens bind the complete Identity value, tool name, and exact
 validated arguments. They expire and can be consumed only once.
 
-ApprovalStore.issue() is a trusted internal operation. A human approval
-interface and approver authentication have not yet been implemented.
-Tests call issue() directly to exercise token enforcement.
+ApprovalStore.issue() is a trusted internal operation.
+
+HumanApproval.request_closure() implements a local console interaction.
+It checks role, workspace, and ticket status, displays the exact request
+with JSON-escaped record values, and requires the exact text APPROVE.
+Refusal, EOF, and interruption deny approval. Approval does not itself
+execute the action.
+
+The console operator is trusted. Separate approver authentication and
+separation of duties are not implemented. The agent must not receive
+access to the approval interaction, token issuer, or console input.
+
+Unit tests exercise token enforcement directly. Human interaction tests
+use simulated input; a manual console demonstration is still pending.
 
 ## Stop behavior
 
