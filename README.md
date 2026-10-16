@@ -51,6 +51,7 @@ Any other response declines approval. Each run starts with fresh lab records.
 ## Documentation
 
 - [Architecture and trust boundaries](docs/architecture.md)
+- [View all diagrams](docs/diagrams.md)
 - [Architecture diagram source](diagrams/architecture.mmd)
 - [Human approval sequence](diagrams/approval-sequence.mmd)
 - [Malicious tool-result attack flow](diagrams/tool-result-attack-flow.mmd)
