@@ -1,6 +1,6 @@
 # Manual Human Approval Demonstration
 
-Date: 2026-10-16
+Documentation date: 16 October 2026
 Command: python -m agent_security.demo
 Environment: local console; synthetic in-memory records.
 

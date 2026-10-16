@@ -1,6 +1,6 @@
 # MITRE ATLAS Mapping
 
-Reference review date: 2026-10-16.
+Documentation date: 16 October 2026.
 
 ## Mappings
 
