@@ -114,3 +114,66 @@ def test_snapshot_does_not_change_when_log_grows():
     assert len(earlier) == 1
     assert len(audit.snapshot()) == 2
     assert earlier[0].event_id != audit.snapshot()[1].event_id
+
+
+def test_same_actor_has_stable_reference(context):
+    gateway, audit, identity = context
+
+    for _ in range(2):
+        gateway.execute(
+            identity, "read_document", {"document_id": "doc-a"}
+        )
+
+    first, second = audit.snapshot()
+    assert first.actor_ref == second.actor_ref
+    assert first.actor_ref != "unknown"
+    assert len(first.actor_ref) == 64
+
+
+def test_different_actors_have_different_references(context):
+    gateway, audit, identity = context
+    other = Identity("user-002", "operator", "workspace-a")
+
+    for actor in (identity, other):
+        gateway.execute(
+            actor, "read_document", {"document_id": "doc-a"}
+        )
+
+    first, second = audit.snapshot()
+    assert first.actor_ref != second.actor_ref
+
+
+def test_raw_subject_is_not_logged(context):
+    gateway, audit, _ = context
+    subject = "SYNTHETIC-PRIVATE-USER-IDENTIFIER"
+    identity = Identity(subject, "operator", "workspace-a")
+
+    gateway.execute(
+        identity, "read_document", {"document_id": "doc-a"}
+    )
+
+    assert subject not in repr(audit.snapshot())
+
+
+def test_denied_request_retains_actor_reference(context):
+    gateway, audit, identity = context
+
+    gateway.execute(
+        identity, "read_document", {"document_id": "doc-a"}
+    )
+    with pytest.raises(AuthorizationDenied):
+        gateway.execute(
+            identity, "read_document", {"document_id": "doc-b"}
+        )
+
+    allowed, denied = audit.snapshot()
+    assert denied.outcome == "denied"
+    assert denied.actor_ref == allowed.actor_ref
+
+
+def test_missing_subject_uses_unknown_reference():
+    audit = AuditLog()
+
+    audit.record("read_document", "denied", "AuthorizationDenied")
+
+    assert audit.snapshot()[0].actor_ref == "unknown"

@@ -50,13 +50,13 @@ class ToolGateway:
                 ApprovalDenied,
                 ResourceNotFound,
             ) as exc:
-                self.audit.record(tool, "denied", type(exc).__name__)
+                self.audit.record(tool, "denied", type(exc).__name__, identity.subject)
                 raise
             except Exception:
-                self.audit.record(tool, "error", "execution_error")
+                self.audit.record(tool, "error", "execution_error", identity.subject)
                 raise
 
-            self.audit.record(tool, "allowed", "executed")
+            self.audit.record(tool, "allowed", "executed", identity.subject)
             return result
 
     def _execute(

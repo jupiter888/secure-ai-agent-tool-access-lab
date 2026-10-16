@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from hashlib import sha256
 from datetime import datetime, timezone
 from threading import Lock
 from uuid import uuid4
@@ -8,6 +9,7 @@ from uuid import uuid4
 class AuditEvent:
     event_id: str
     timestamp: str
+    actor_ref: str
     tool: str
     outcome: str
     reason: str
@@ -20,7 +22,10 @@ class AuditLog:
         self._events: list[AuditEvent] = []
         self._lock = Lock()
 
-    def record(self, tool: str, outcome: str, reason: str) -> None:
+    def record(
+        self, tool: str, outcome: str, reason: str,
+        subject: str = "",
+    ) -> None:
         safe_tool = (
             tool
             if isinstance(tool, str)
@@ -45,9 +50,16 @@ class AuditLog:
         if reason not in allowed_reasons:
             raise ValueError("Invalid audit reason")
 
+        actor_ref = (
+            sha256(subject.encode("utf-8")).hexdigest()
+            if isinstance(subject, str) and subject.strip()
+            else "unknown"
+        )
+
         event = AuditEvent(
             event_id=uuid4().hex,
             timestamp=datetime.now(timezone.utc).isoformat(),
+            actor_ref=actor_ref,
             tool=safe_tool,
             outcome=outcome,
             reason=reason,
