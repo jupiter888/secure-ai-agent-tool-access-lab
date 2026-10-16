@@ -54,7 +54,9 @@ separation of duties are not implemented. The agent must not receive
 access to the approval interaction, token issuer, or console input.
 
 Unit tests exercise token enforcement directly. Human interaction tests
-use simulated input; a manual console demonstration is still pending.
+use simulated input. A manual console demonstration verified denial
+without approval, successful approved closure, and denial of token reuse.
+See evidence/manual-approval-demo.md.
 
 ## Stop behavior
 
