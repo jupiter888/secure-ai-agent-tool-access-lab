@@ -52,6 +52,8 @@ Any other response declines approval. Each run starts with fresh lab records.
 
 - [Architecture and trust boundaries](docs/architecture.md)
 - [Architecture diagram source](diagrams/architecture.mmd)
+- [Human approval sequence](diagrams/approval-sequence.mmd)
+- [Malicious tool-result attack flow](diagrams/tool-result-attack-flow.mmd)
 - [Permission matrix](docs/permission-matrix.md)
 - [Threat model and residual risks](docs/threat-model.md)
 - [Stop and recovery runbook](docs/recovery-runbook.md)

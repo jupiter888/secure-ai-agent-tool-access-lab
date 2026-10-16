@@ -1,0 +1,24 @@
+flowchart TD
+    Document["Synthetic document with malicious instructions"]
+    Retrieve["Authorized retrieval from workspace A"]
+    Simulate["Tests simulate agent following instructions"]
+
+    Document --> Retrieve
+    Retrieve --> Simulate
+
+    Simulate --> Read["Request document from workspace B"]
+    Simulate --> Role["Reader requests ticket closure"]
+    Simulate --> Claim["Operator claims approval in text"]
+    Simulate --> Flag["Supply approved=true argument"]
+
+    Read --> Ownership["Workspace check denies access"]
+    Role --> Permission["Role check denies closure"]
+    Claim --> Token["Missing approval token denies closure"]
+    Flag --> Schema["Argument validation rejects extra field"]
+
+    Ownership --> Audit["Denied execution recorded"]
+    Permission --> Audit
+    Token --> Audit
+    Schema --> Audit
+
+    Audit --> Result["No unauthorized document returned; ticket remains open"]
