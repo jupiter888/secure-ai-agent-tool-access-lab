@@ -47,7 +47,7 @@ invalidate outstanding tokens.
 Run:
 
     python -m pytest -q
-    python -m agent_security.demo
+    python -m agent_security.agent.demo
 
 Expected demonstration:
 

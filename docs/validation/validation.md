@@ -37,4 +37,4 @@ performed. All three diagrams rendered in the Mermaid editor, including the revi
 approval sequence. The revised sequence was visually reviewed against
 the implementation. GitHub rendering has not been verified.
 
-See threat-model.md and architecture.md for remaining deployment limitations.
+See the [threat model](../threat-model/threat-model.md) and [architecture](../architecture/architecture.md) for remaining deployment limitations.

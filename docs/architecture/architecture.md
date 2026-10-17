@@ -56,7 +56,7 @@ access to the approval interaction, token issuer, or console input.
 Unit tests exercise token enforcement directly. Human interaction tests
 use simulated input. A manual console demonstration verified denial
 without approval, successful approved closure, and denial of token reuse.
-See evidence/manual-approval-demo.md.
+See the [manual approval evidence](../../evidence/manual/manual-approval-demo.md).
 
 ## Stop behavior
 

@@ -1,10 +1,10 @@
 from threading import RLock
 
-from agent_security.approvals import ApprovalDenied, ApprovalStore
-from agent_security.audit import AuditLog
-from agent_security.policy import AuthorizationDenied, Identity, authorize
-from agent_security.store import LabStore, ResourceNotFound
-from agent_security.validation import InvalidArguments, validate_arguments
+from agent_security.security.approvals import ApprovalDenied, ApprovalStore
+from agent_security.security.audit import AuditLog
+from agent_security.security.policy import AuthorizationDenied, Identity, authorize
+from agent_security.tools.store import LabStore, ResourceNotFound
+from agent_security.security.validation import InvalidArguments, validate_arguments
 
 
 class ExecutionStopped(Exception):

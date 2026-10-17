@@ -43,24 +43,24 @@ audit sanitization, and simulated malicious tool-result instructions.
 
 ## Run the console demonstration
 
-    python -m agent_security.demo
+    python -m agent_security.agent.demo
 
 Type APPROVE when prompted to demonstrate approved closure and replay denial.
 Any other response declines approval. Each run starts with fresh lab records.
 
 ## Documentation
 
-- [Architecture and trust boundaries](docs/architecture.md)
-- [View all diagrams](docs/diagrams.md)
+- [Architecture and trust boundaries](docs/architecture/architecture.md)
+- [View all diagrams](docs/architecture/diagrams.md)
 - [Architecture diagram source](diagrams/architecture.mmd)
 - [Human approval sequence](diagrams/approval-sequence.mmd)
 - [Malicious tool-result attack flow](diagrams/tool-result-attack-flow.mmd)
-- [Permission matrix](docs/permission-matrix.md)
-- [Threat model and residual risks](docs/threat-model.md)
-- [Validation and audit findings](docs/validation.md)
-- [Stop and recovery runbook](docs/recovery-runbook.md)
-- [Manual approval demonstration](evidence/manual-approval-demo.md)
-- [Automated test results](evidence/pytest-results.txt)
+- [Permission matrix](docs/mitigations/permission-matrix.md)
+- [Threat model and residual risks](docs/threat-model/threat-model.md)
+- [Validation and audit findings](docs/validation/validation.md)
+- [Stop and recovery runbook](docs/mitigations/recovery-runbook.md)
+- [Manual approval demonstration](evidence/manual/manual-approval-demo.md)
+- [Automated test results](evidence/tests/pytest-results.txt)
 
 ## Evidence boundaries
 
@@ -77,6 +77,6 @@ and stop activation are not separately audited.
 
 ## MITRE ATLAS
 
-[Technique mappings and evidence limits](docs/mitre-atlas-mapping.md)
+[Technique mappings and evidence limits](docs/atlas/mitre-atlas-mapping.md)
 cover indirect prompt injection and agent tool invocation, using an
 official MITRE reference.

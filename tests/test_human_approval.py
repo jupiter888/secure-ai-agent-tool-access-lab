@@ -2,11 +2,11 @@ import json
 
 import pytest
 
-from agent_security.approvals import ApprovalDenied, ApprovalStore
-from agent_security.gateway import ToolGateway
-from agent_security.human_approval import HumanApproval
-from agent_security.policy import AuthorizationDenied, Identity
-from agent_security.store import LabStore
+from agent_security.security.approvals import ApprovalDenied, ApprovalStore
+from agent_security.security.gateway import ToolGateway
+from agent_security.security.human_approval import HumanApproval
+from agent_security.security.policy import AuthorizationDenied, Identity
+from agent_security.tools.store import LabStore
 
 
 @pytest.fixture

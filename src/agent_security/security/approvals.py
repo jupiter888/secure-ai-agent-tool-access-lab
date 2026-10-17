@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from threading import Lock
 from typing import Callable
 
-from agent_security.policy import Identity, authorize
-from agent_security.validation import validate_arguments
+from agent_security.security.policy import Identity, authorize
+from agent_security.security.validation import validate_arguments
 
 
 class ApprovalDenied(Exception):

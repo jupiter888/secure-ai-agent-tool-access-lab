@@ -1,7 +1,7 @@
 # Manual Human Approval Demonstration
 
 Documentation date: 16 October 2026
-Command: python -m agent_security.demo
+Command: python -m agent_security.agent.demo
 Environment: local console; synthetic in-memory records.
 
 ## Observed results
@@ -16,3 +16,12 @@ Environment: local console; synthetic in-memory records.
 No external services or real business records were modified.
 Approval refusal and cancellation are covered by automated tests;
 they were not exercised in this manual run.
+
+## Revalidation after directory reorganization
+
+Date: 17 October 2026.
+Command: python -m agent_security.agent.demo
+
+Observed: unapproved closure denied, approved closure allowed, approval
+reuse denied, and final ticket status closed. Audit outcomes were
+denied, allowed, denied for the same synthetic actor.

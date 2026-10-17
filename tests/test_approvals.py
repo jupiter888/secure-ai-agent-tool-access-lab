@@ -1,7 +1,7 @@
 import pytest
 
-from agent_security.approvals import ApprovalDenied, ApprovalStore
-from agent_security.policy import AuthorizationDenied, Identity
+from agent_security.security.approvals import ApprovalDenied, ApprovalStore
+from agent_security.security.policy import AuthorizationDenied, Identity
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 import pytest
 
-from agent_security.validation import InvalidArguments, validate_arguments
+from agent_security.security.validation import InvalidArguments, validate_arguments
 
 
 @pytest.mark.parametrize(

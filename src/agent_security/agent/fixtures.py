@@ -1,4 +1,4 @@
-from agent_security.store import Document
+from agent_security.tools.store import Document
 
 
 MALICIOUS_DOCUMENT = Document(

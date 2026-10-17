@@ -1,6 +1,6 @@
 import pytest
 
-from agent_security.policy import (
+from agent_security.security.policy import (
     AuthorizationDenied,
     Identity,
     authorize,

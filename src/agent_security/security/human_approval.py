@@ -1,10 +1,10 @@
 import json
 from collections.abc import Callable
 
-from agent_security.approvals import ApprovalDenied, ApprovalStore
-from agent_security.policy import AuthorizationDenied, Identity, authorize
-from agent_security.store import LabStore
-from agent_security.validation import validate_arguments
+from agent_security.security.approvals import ApprovalDenied, ApprovalStore
+from agent_security.security.policy import AuthorizationDenied, Identity, authorize
+from agent_security.tools.store import LabStore
+from agent_security.security.validation import validate_arguments
 
 
 class HumanApproval:

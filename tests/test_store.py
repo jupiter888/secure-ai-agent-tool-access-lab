@@ -2,7 +2,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from agent_security.store import LabStore, ResourceNotFound
+from agent_security.tools.store import LabStore, ResourceNotFound
 
 
 @pytest.mark.parametrize(

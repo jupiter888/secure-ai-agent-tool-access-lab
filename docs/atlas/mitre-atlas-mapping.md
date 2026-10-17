@@ -6,8 +6,8 @@ Documentation date: 16 October 2026.
 
 | Technique | Lab scenario | Evidence | Limit |
 | --- | --- | --- | --- |
-| [AML.T0051.001 — LLM Prompt Injection: Indirect](https://atlas.mitre.org/techniques/AML.T0051.001) | Malicious instructions embedded in a retrieved synthetic document | [Fixture](../src/agent_security/fixtures.py); [injection tests](../tests/test_tool_result_injection.py) | Agent compliance is simulated; no live model is evaluated |
-| [AML.T0053 — AI Agent Tool Invocation](https://atlas.mitre.org/techniques/AML.T0053) | Simulated attacker-directed requests to read another workspace or close a ticket | [Injection tests](../tests/test_tool_result_injection.py); [gateway tests](../tests/test_gateway.py) | Tests validate application enforcement, not successful compromise of a real agent |
+| [AML.T0051.001 — LLM Prompt Injection: Indirect](https://atlas.mitre.org/techniques/AML.T0051.001) | Malicious instructions embedded in a retrieved synthetic document | [Fixture](../../src/agent_security/agent/fixtures.py); [injection tests](../../tests/test_tool_result_injection.py) | Agent compliance is simulated; no live model is evaluated |
+| [AML.T0053 — AI Agent Tool Invocation](https://atlas.mitre.org/techniques/AML.T0053) | Simulated attacker-directed requests to read another workspace or close a ticket | [Injection tests](../../tests/test_tool_result_injection.py); [gateway tests](../../tests/test_gateway.py) | Tests validate application enforcement, not successful compromise of a real agent |
 
 ## Interpretation
 
